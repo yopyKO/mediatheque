@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mediatheque</title>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="form">
+                <h1>Connexion</h1>
+                <form method="post" action="{% url 'connexion' %}">
+                    {% csrf_token %}
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" name="username" required>
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password" required>
+                    <button type="submit">Se connecter</button>
+                </form>
+                <p class="link">Pas encore inscrit ? <a href="{% url 'inscription' %}">S'inscrire</a></p>
+            </div>
+        </div>
+    </header>
+    <main>
+        <h2>LISTE DES MEDIAS</h2>
+        <nav>
+            <ul>
+                <h3>Livres</h3>
+                {% for Livre in Livres %}
+                <li>Titre : {{ Livre.name }} Auteur : {{Livre.auteur}}</li>
+                {% endfor %}
+            </ul>
+            <ul>
+                <h3>DVDs</h3>
+                {% for Dvd in Dvds %}
+                <li>Titre : {{ livre.name }} Auteur : {{livre.auteur}}</li>
+                {% endfor %}
+            </ul>
+            <ul>
+                <h3>CDs</h3>
+                {% for Cd in Cds %}
+                <li>Titre : {{ livre.name }} Auteur : {{livre.auteur}}</li>
+                {% endfor %}
+            </ul>
+            <ul>
+                <h3>Jeux de société</h3>
+                {% for Jeu in Jeux %}
+                <li>Titre : {{ livre.name }} Auteur : {{livre.auteur}}</li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </main>
+   
+</body>
+</html>
