@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mediatheque - interface bibliothécaire</title>
+</head>
+<body>
+    <header>
+        <div class="container home">
+            <h1>Bienvenue bibliothécaire!</h1>
+            <button><a href="{% url 'deconnexion' %}">Se déconnecter!</a></button>
+        </div>
+    </header>
+    <main>
+        <div>
+            <h2>Créer un membre</h2>
+        </div>
+        <div>
+            <h2>Afficher la liste des membres</h2>
+        </div>
+        <div>
+            <h2>Mettre à jour un membre</h2>
+        </div>
+        <div>
+            <h2>Afficher la liste des médias</h2>
+        </div>
+        <div>
+            <h2>Créer un emprunt pour un média disponible</h2>
+        </div>
+        <div>
+            <h2>Ajouter un nouveau média</h2>
+            <div>
+                <h3>Ajouter un Livre</h3>
+                <form action="" method="post" novalidate>
+                    {% csrf_token %}
+                    {{CreationLivre.as_p }}
+                    <input type="submit" value="Envoyer">
+                </form>
+            </div>
+            <div></div>
+            <div></div>
+        </div>
+        <div>
+            <h2>Rentrer un emprunt</h2>
+        </div>
+    </main>
+</body>
+</html>
