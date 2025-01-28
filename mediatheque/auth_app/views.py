@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import CustomUserCreationForm, CreationLivreForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from medias.models import Livre
+from auth_app.models import Livre
+
 
 # Create your views here
 def inscription(request):
@@ -30,7 +31,16 @@ def connexion(request):
 
 @login_required
 def accueil(request):
-    return render(request, 'accueil.html')
+    if request.method =='POST':
+        form = CreationLivreForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('accueil')
+    else:
+        form = CreationLivreForm()
+
+    Livres = Livre.objects.all()
+    return render(request, 'accueil.html',{'CreationLivre':form, 'Livres': Livres})
 
 def deconnexion(request):
     logout(request)
@@ -40,16 +50,26 @@ def ListeLivres(request):
     Livres = Livre.objects.all()
     return render(request, 'connexion.html',{'Livres':Livres})
 
-def ajoutLivre(request):
-    if request.method =='POST':
-        CreationLivre = CreationLivre(request.POST)
-        if CreationLivre.is_valid():
-            Livre = Livre()
-            Livre.name = CreationLivre.cleaned_data['nom']
-            Livre.auteur = CreationLivre.cleaned_data['auteur']
-            Livre.save()
-            Livres = Livre.objects.all()
-            return render(request, 'connexion.html', {'Livres': Livres})
-        else:
-            CreationLivre = CreationLivre()
-            return render(request, 'accueil.html',{'CreationLivre':CreationLivre})
+# Modifier un livre
+@login_required
+def modifier_livre(request, livre_id):
+    livre = get_object_or_404(Livre, id=livre_id)
+    if request.method == 'POST':
+        form = CreationLivreForm(request.POST, instance=livre)
+        if form.is_valid():
+            form.save()
+            return redirect('accueil')  # Redirige vers la liste des livres
+    else:
+        form = CreationLivreForm(instance=livre)  # Pré-remplit le formulaire avec les données existantes
+
+    return render(request, 'modifier_livre.html', {'form': form, 'livre': livre})
+
+# Supprimer un livre
+@login_required
+def supprimer_livre(request, livre_id):
+    livre = get_object_or_404(Livre, id=livre_id)
+    if request.method == 'POST':  # Confirmation avant suppression
+        livre.delete()
+        return redirect('accueil')
+
+    return render(request, 'supprimer_livre.html', {'livre': livre})

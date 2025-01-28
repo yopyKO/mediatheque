@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from auth_app.models import Livre
 
 # creating forms
 class CustomUserCreationForm(UserCreationForm):
@@ -16,6 +17,7 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ("password1", "password2")
         
-class CreationLivre(forms.Form):
-    nom = forms.CharField(required=False)
-    auteur = forms.CharField(required=False)
+class CreationLivreForm(forms.ModelForm):
+    class Meta:
+        model = Livre
+        fields = ['nom', 'auteur']
