@@ -14,29 +14,38 @@
     </header>
     <main>
         <div>
-            <h2>Créer un membre</h2>
-        </div>
-        <div>
-            <h2>Afficher la liste des membres</h2>
-        </div>
-        <div>
-            <h2>Mettre à jour un membre</h2>
-        </div>
-        <div>
-            <h2>Afficher la liste des médias</h2>
+            <h2>MEMBRES</h2>
         </div>
         <div>
             <h2>Créer un emprunt pour un média disponible</h2>
         </div>
         <div>
-            <h2>Ajouter un nouveau média</h2>
+            <h2>MEDIAS</h2>
             <div>
                 <h3>Ajouter un Livre</h3>
-                <form action="" method="post" novalidate>
+                <form action="" method="post" action="" novalidate>
                     {% csrf_token %}
-                    {{CreationLivre.as_p }}
+                    {{ CreationLivre.as_p }}
+                    {% if CreationLivre.errors %}
+                        <div class="errors">
+                            {{ CreationLivre.errors }}
+                        </div>
+                    {% endif %}
                     <input type="submit" value="Envoyer">
                 </form>
+                <h3>Liste des Livres</h3>
+                <ul>
+                    {% for Livre in Livres %}
+                    <li> 
+                        Titre : {{ Livre.nom }}  Auteur : {{ Livre.auteur }}
+                        <br>
+                        <button><a href="{% url 'modifier_livre' Livre.id %}">Modifier</a></button> |
+                        <button><a href="{% url 'supprimer_livre' Livre.id %}">Supprimer</a></button>
+                    </li>
+                    {% empty %}
+                    <li>Aucun livre ajouté pour le moment.</li>
+                    {% endfor %}
+               </ul>
             </div>
             <div></div>
             <div></div>
