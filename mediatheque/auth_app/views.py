@@ -46,10 +46,6 @@ def deconnexion(request):
     logout(request)
     return redirect('connexion')
 
-def ListeLivres(request):
-    Livres = Livre.objects.all()
-    return render(request, 'connexion.html',{'Livres':Livres})
-
 # Modifier un livre
 @login_required
 def modifier_livre(request, livre_id):
@@ -73,3 +69,8 @@ def supprimer_livre(request, livre_id):
         return redirect('accueil')
 
     return render(request, 'supprimer_livre.html', {'livre': livre})
+
+
+def liste_livres_publique(request):
+    Livres = Livre.objects.all()
+    return render(request, 'liste_livres_publique.html',{'Livres':Livres})

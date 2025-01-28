@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Livres</title>
+</head>
+<body>
+    <button><a href="{% url 'connexion' %}">Retour</a></button>
+    <h1>Les Livres disponibles à l'emprunt</h1>
+    <ul>
+        {% for Livre in Livres %}
+            <li>
+                <strong>{{ Livre.nom }}</strong> - {{ Livre.auteur }}
+            </li>
+        {% empty %}
+            <li>Aucun livre disponible pour le moment.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
