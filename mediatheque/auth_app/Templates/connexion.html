@@ -32,10 +32,7 @@
         <h2>LISTE DES MEDIAS</h2>
         <nav>
             <ul>
-                <h3>Livres</h3>
-                {% for Livre in Livres %}
-                <li>Titre : {{ Livre.nom }} Auteur : {{Livre.auteur}}</li>
-                {% endfor %}
+                <a href="{% url 'liste_livres_publique' %}"><h3>Livres</h3></a>
             </ul>
             <ul>
                 <h3>DVDs</h3>

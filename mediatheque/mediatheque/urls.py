@@ -26,4 +26,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('modifier-livre/<int:livre_id>/', views.modifier_livre, name='modifier_livre'),
     path('supprimer-livre/<int:livre_id>/', views.supprimer_livre, name='supprimer_livre'),
+    path('liste-livres/', views.liste_livres_publique, name='liste_livres_publique'),
 ]
