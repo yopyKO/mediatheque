@@ -7,6 +7,12 @@
 </head>
 <body>
     <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'accueil' %}">Accueil bibliothécaire</a></li>
+                <li><a href="{% url 'connexion' %}">Page d'accueil utilisateur</a></li>
+            </ul>
+        </nav>
         <div class="container">
             <div class="form">
                 <h1>Connexion</h1>
@@ -28,7 +34,7 @@
             <ul>
                 <h3>Livres</h3>
                 {% for Livre in Livres %}
-                <li>Titre : {{ Livre.name }} Auteur : {{Livre.auteur}}</li>
+                <li>Titre : {{ Livre.nom }} Auteur : {{Livre.auteur}}</li>
                 {% endfor %}
             </ul>
             <ul>

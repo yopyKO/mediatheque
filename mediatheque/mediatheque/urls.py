@@ -24,4 +24,6 @@ urlpatterns = [
     path('accueil/', views.accueil, name='accueil'),
     path('deconnexion/', views.deconnexion, name='deconnexion'),
     path('admin/', admin.site.urls),
+    path('modifier-livre/<int:livre_id>/', views.modifier_livre, name='modifier_livre'),
+    path('supprimer-livre/<int:livre_id>/', views.supprimer_livre, name='supprimer_livre'),
 ]
