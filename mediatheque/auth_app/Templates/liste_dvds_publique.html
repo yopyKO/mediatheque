@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Dvds</title>
+</head>
+<body>
+    <button><a href="{% url 'connexion' %}">Retour</a></button>
+    <h1>Les Dvds disponibles à l'emprunt</h1>
+    <ul>
+        {% for Dvd in Dvds %}
+            <li>
+                <strong>{{ Dvd.nom }}</strong> - {{ Dvd.realisateur }}
+            </li>
+        {% empty %}
+            <li>Aucun Dvd disponible pour le moment.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

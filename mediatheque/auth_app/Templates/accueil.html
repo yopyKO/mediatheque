@@ -26,11 +26,6 @@
                 <form action="" method="post" action="" novalidate>
                     {% csrf_token %}
                     {{ CreationLivre.as_p }}
-                    {% if CreationLivre.errors %}
-                        <div class="errors">
-                            {{ CreationLivre.errors }}
-                        </div>
-                    {% endif %}
                     <input type="submit" value="Envoyer">
                 </form>
                 <h3>Liste des Livres</h3>
@@ -47,8 +42,48 @@
                     {% endfor %}
                </ul>
             </div>
-            <div></div>
-            <div></div>
+            <div>
+                <h3>Ajouter un DVD</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ CreationDvd.as_p }}
+                    <input type="submit" value="Ajouter DVD">
+                </form>
+                <h3>Liste des DVDs</h3>
+                <ul>
+                    {% for dvd in Dvds %}
+                        <li>
+                            Titre : {{ dvd.nom }} | Réalisateur : {{ dvd.realisateur }}
+                            <br>
+                            <button><a href="{% url 'modifier_dvd' dvd.id %}">Modifier</a></button> |
+                            <button><a href="{% url 'supprimer_dvd' dvd.id %}">Supprimer</a></button>
+                        </li>
+                    {% empty %}
+                        <li>Aucun DVD ajouté.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <h3>Ajouter un CD</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ CreationCd.as_p }}
+                    <input type="submit" value="Ajouter CD">
+                </form>
+                <h3>Liste des CDs</h3>
+                <ul>
+                    {% for cd in Cds %}
+                        <li>
+                            Titre : {{ cd.nom }} | Interprète : {{ cd.interprete }}
+                            <br>
+                            <button><a href="{% url 'modifier_cd' cd.id %}">Modifier</a></button> |
+                            <button><a href="{% url 'supprimer_cd' cd.id %}">Supprimer</a></button>
+                        </li>
+                    {% empty %}
+                        <li>Aucun CD ajouté.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
         <div>
             <h2>Rentrer un emprunt</h2>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer un DVD</title>
+</head>
+<body>
+    <h1>Supprimer un DVD</h1>
+    <p>Voulez-vous vraiment supprimer le DVD : <strong>{{ dvd.nom }}</strong> ?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Oui, supprimer</button>
+    </form>
+    <a href="{% url 'accueil' %}">Non, retourner</a>
+</body>
+</html>
