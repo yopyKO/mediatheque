@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier un DVD</title>
+</head>
+<body>
+    <h1>Modifier un DVD</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Enregistrer">
+    </form>
+    <a href="{% url 'accueil' %}">Annuler</a>
+</body>
+</html>

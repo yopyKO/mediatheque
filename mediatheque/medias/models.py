@@ -1,60 +1,51 @@
 from django.db import models
 
-class Medias():
-    name =  models.fields.CharField(max_length=150)
-    dateEmprunt = models.DateField(null=True, blank=True)
+class Media(models.Model):
+    nom =  models.CharField(max_length=150)
+    date_emprunt = models.DateField(null=True, blank=True)
     disponible = models.BooleanField(default=True)
-    emprunteur = models.fields.CharField(max_length=150)
+    emprunteur = models.CharField(max_length=150)
 
-    def __init__(self, name, dateEmprunt, disponible, emprunteur):
-        self.name = name
-        self.dateEmprunt = dateEmprunt
-        self.disponible = disponible
-        self.emprunteur = emprunteur
+    def emprunter(self, emprunteur):
+        #Méthode pour emprunter un média
+        if self.disponible:
+            self.disponible = False
+            self.emprunteur = emprunteur
+            self.date_emprunt = models.DateField(auto_now=True)  # Met à jour la date d'emprunt
+            self.save()
+            print(f"{self.nom} a été emprunté par {emprunteur}.")
+        else:
+            print(f"{self.nom} n'est pas disponible pour l'emprunt.")
 
-    def description(self):
-        return f"{self.name} emprunté le, {self.dateEmprunt} - Disponible : {self.disponible} | Emprunteur : {self.emprunteur}"
+    def rendre(self):
+        #Méthode pour rendre un média
+        if not self.disponible:
+            print(f"{self.nom} a été rendu par {self.emprunteur}.")
+            self.disponible = True
+            self.emprunteur = None
+            self.date_emprunt = None
+            self.save()
+        else:
+            print(f"{self.nom} est déjà disponible.")
+
+    def __str__(self):
+        return self.nom
     
-class Livre(Medias):
-    auteur = models.fields.CharField(max_length=150)
+class Livre(Media):
+    auteur = models.CharField(max_length=150)
 
-    def __init__(self, name, dateEmprunt, disponible, emprunteur, auteur):
-        # Appel du constructeur de la classe parente
-        super().__init__(name, dateEmprunt, disponible, emprunteur)
-        self.auteur = auteur
-
-    def description(self):
-        base_description = super().description()  # Appelle la méthode description de Medias
-        return f" - Auteur : {self.auteur} | {base_description}"
-
-    def lecture(self):
-        print("Livre de " + self.auteur) 
-
-class Dvd(Medias):
-    réalisateur= models.fields.CharField(max_length=150)
-
-    def __init__(self, titre, réalisateur, dateEmprunt, disponible, emprunteur):
-        self.titre = titre
-        self.réalisateur = réalisateur
-        self.dateEmprunt = dateEmprunt
-        self.disponible = disponible
-        self.emprunteur = emprunteur
-
-    def description(self):
-        return self.titre + " de " + self.réalisateur + ", emprunté le " + self.dateEmprunt + " par " + self.emprunteur
-    
-Dvd1 = Dvd('Interstellar', 'Chrisopher Nolan', '25/12/2024', 'non', 'George Dupont')
-
-class Cd(Medias):
-    interprete= models.fields.CharField(max_length=150)
+    def __str__(self):
+        return f"Livre: {self.nom}, Auteur: {self.auteur}"
 
 
-    def __init__(self, titre, interprete, dateEmprunt, disponible, emprunteur):
-        self.titre = titre
-        self.interprete = interprete
-        self.dateEmprunt = dateEmprunt
-        self.disponible = disponible
-        self.emprunteur = emprunteur
+class Dvd(Media):
+    realisateur= models.CharField(max_length=150)
 
-    def description(self):
-        return self.titre + " de " + self.interprete + ", emprunté le " + self.dateEmprunt + " par " + self.emprunteur
+    def __str__(self):
+        return f"Dvd: {self.nom}, Réalisateur: {self.realisateur}"
+
+class Cd(Media):
+    interprete= models.CharField(max_length=150)
+
+    def __str__(self):
+        return f"Cd: {self.nom}, Interprete: {self.interprete}"

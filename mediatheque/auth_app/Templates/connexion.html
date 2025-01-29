@@ -15,7 +15,7 @@
         </nav>
         <div class="container">
             <div class="form">
-                <h1>Connexion</h1>
+                <h1>Connexion bibliothécaire</h1>
                 <form method="post" action="{% url 'connexion' %}">
                     {% csrf_token %}
                     <label for="username">Nom d'utilisateur</label>
@@ -35,22 +35,12 @@
                 <a href="{% url 'liste_livres_publique' %}"><h3>Livres</h3></a>
             </ul>
             <ul>
-                <h3>DVDs</h3>
-                {% for Dvd in Dvds %}
-                <li>Titre : {{ livre.name }} Auteur : {{livre.auteur}}</li>
-                {% endfor %}
+                <a href="{% url 'liste_dvds_publique' %}"><h3>DVDs</h3></a>
             </ul>
             <ul>
-                <h3>CDs</h3>
-                {% for Cd in Cds %}
-                <li>Titre : {{ livre.name }} Auteur : {{livre.auteur}}</li>
-                {% endfor %}
+                <a href="{% url 'liste_cds_publique' %}"><h3>CDs</h3></a>
             </ul>
             <ul>
-                <h3>Jeux de société</h3>
-                {% for Jeu in Jeux %}
-                <li>Titre : {{ livre.name }} Auteur : {{livre.auteur}}</li>
-                {% endfor %}
             </ul>
         </nav>
     </main>

@@ -16,8 +16,3 @@ class CustomUserCreationForm(UserCreationForm):
     )
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ("password1", "password2")
-        
-class CreationLivreForm(forms.ModelForm):
-    class Meta:
-        model = Livre
-        fields = ['nom', 'auteur']
