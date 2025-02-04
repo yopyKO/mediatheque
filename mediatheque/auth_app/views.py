@@ -2,9 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from medias.models import Livre, Dvd, Cd
+from medias.models import Livre, Dvd, Cd, Media, Emprunt
 from medias.forms import CreationLivreForm, CreationDvdForm, CreationCdForm
+from mediatheque.models import Membre
+from mediatheque.forms import CreationMembreForm
 from .forms import CustomUserCreationForm
+from django.utils import timezone
 
 
 # Create your views here
@@ -36,9 +39,10 @@ def accueil(request):
         livre_form = CreationLivreForm(request.POST)
         dvd_form = CreationDvdForm(request.POST)
         cd_form = CreationCdForm(request.POST)
+        membre_form = CreationMembreForm(request.POST)
 
         if livre_form.is_valid():
-            form.save()
+            livre_form.save()
             return redirect('accueil')
         
         if dvd_form.is_valid():
@@ -48,14 +52,20 @@ def accueil(request):
         if cd_form.is_valid():
             cd_form.save()
             return redirect('accueil')
+        
+        if membre_form.is_valid():
+            membre_form.save()
+            return redirect('accueil')
     else:
         livre_form = CreationLivreForm()
         dvd_form = CreationDvdForm()
         cd_form = CreationCdForm()
+        membre_form = CreationMembreForm()
 
     livres = Livre.objects.all()
     dvds = Dvd.objects.all()
     cds = Cd.objects.all()
+    membres = Membre.objects.all()
 
     return render(request, 'accueil.html',{
         'CreationLivre': livre_form,
@@ -63,7 +73,9 @@ def accueil(request):
         'CreationCd': cd_form,
         'Livres': livres,
         'Dvds': dvds,
-        'Cds': cds
+        'Cds': cds,
+        'CreationMembre': membre_form,
+        'Membres': membres,
         })
 
 def deconnexion(request):
@@ -106,7 +118,7 @@ def modifier_dvd(request, dvd_id):
     else:
         form = CreationDvdForm(instance=dvd)
 
-    return render(request, 'modifier_dvd.html', {'form': form, 'livre': dvd})
+    return render(request, 'modifier_dvd.html', {'form': form, 'dvd': dvd})
 
 # Supprimer un DVD
 @login_required
@@ -130,7 +142,7 @@ def modifier_cd(request, cd_id):
     else:
         form = CreationCdForm(instance=cd)
 
-    return render(request, 'modifier_cd.html', {'form': form, 'livre': cd})
+    return render(request, 'modifier_cd.html', {'form': form, 'cd': cd})
 
 # Supprimer un CD
 @login_required
@@ -140,9 +152,33 @@ def supprimer_cd(request, cd_id):
         cd.delete()
         return redirect('accueil')
 
-    return render(request, 'supprimer_dvd.html', {'dvd': cd})
+    return render(request, 'supprimer_dvd.html', {'cd': cd})
 
+# Modifier un Membre
+@login_required
+def modifier_membre(request, membre_id):
+    membre = get_object_or_404(Membre, id=membre_id)
+    if request.method == 'POST':
+        form = CreationMembreForm(request.POST, instance=membre)
+        if form.is_valid():
+            form.save()
+            return redirect('accueil')
+    else:
+        form = CreationMembreForm(instance=membre)
 
+    return render(request, 'modifier_membre.html', {'form': form, 'membre': membre})
+
+# Supprimer un Membre
+@login_required
+def supprimer_membre(request, membre_id):
+    membre = get_object_or_404(Membre, id=membre_id)
+    if request.method == 'POST':  # Confirmation avant suppression
+        membre.delete()
+        return redirect('accueil')
+
+    return render(request, 'supprimer_membre.html', {'membre': membre})
+
+#Litse de Medias publique
 def liste_livres_publique(request):
     Livres = Livre.objects.all()
     return render(request, 'liste_livres_publique.html',{'Livres':Livres})
@@ -154,3 +190,50 @@ def liste_cds_publique(request):
 def liste_dvds_publique(request):
     Dvds = Dvd.objects.all()
     return render(request,'liste_dvds_publique.html',{'Dvds':Dvds})
+
+@login_required
+def emprunter(request, media_id):
+    media = get_object_or_404(Media, id=media_id)
+
+    # Vérifier si l'utilisateur a un compte membre
+    membre = get_object_or_404(Membre, user=request.user)
+
+    # Vérifier si le média est disponible
+    if not media.disponible:
+        messages.error(request, "Ce média est déjà emprunté.")
+        return redirect('accueil')
+
+    # Créer l'emprunt
+    Emprunt.objects.create(
+        media=media,
+        membre=membre,
+        date_emprunt=timezone.now()
+    )
+
+    # Marquer le média comme indisponible
+    media.disponible = False
+    media.save()
+
+    messages.success(request, f"Vous avez emprunté '{media.nom}' avec succès !")
+    return redirect('accueil')
+
+@login_required
+def restituer(request, media_id):
+    media = get_object_or_404(Livre, id=media_id)
+    membre = get_object_or_404(Membre, user=request.user)
+
+    emprunt = Emprunt.objects.filter(media=media, membre=membre).first()
+
+    if not emprunt:
+        messages.error(request, "Vous n'avez pas emprunté ce média.")
+        return redirect('accueil')
+
+    # Supprimer l'emprunt ou le marquer comme terminé
+    emprunt.delete()
+
+    # Marquer le média comme disponible
+    media.disponible = True
+    media.save()
+
+    messages.success(request, f"Vous avez retourné '{media.nom}'.")
+    return redirect('accueil')

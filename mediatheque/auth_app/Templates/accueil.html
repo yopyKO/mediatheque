@@ -10,14 +10,45 @@
         <div class="container home">
             <h1>Bienvenue bibliothécaire!</h1>
             <button><a href="{% url 'deconnexion' %}">Se déconnecter!</a></button>
+            <button><a href="{% url 'connexion' %}">Voir la page membre</a></button>
         </div>
     </header>
     <main>
         <div>
             <h2>MEMBRES</h2>
+            <div>
+                <h3>Ajouter un Membre</h3>
+                <form action="" method="post" action="" novalidate>
+                    {% csrf_token %}
+                    {{ CreationMembre.as_p }}
+                    <input type="submit" value="Envoyer">
+                </form>
+                <h3>Liste des Membres</h3>
+                <ul>
+                    {% for Membre in Membres %}
+                    <li> 
+                        Nom : {{ Membre.prenom }} {{ Membre.nom }} 
+                        <button><a href="{% url 'modifier_membre' Membre.id %}">Modifier</a></button>
+                        <button><a href="{% url 'supprimer_membre' Membre.id %}">Supprimer</a></button>
+                    </li>
+                    {% empty %}
+                    <li>Aucun membre ajouté pour le moment.</li>
+                    {% endfor %}
+               </ul>
+            </div>
         </div>
         <div>
+            {% for Media in Medias %}
+                <p>{{ media.nom }}
+                    {% if media.disponible %}
+                        <a href="{% url 'emprunter' media.id %}" class="btn btn-primary">Emprunter</a>
+                    {% else %}
+                        <span style="color: red;">Indisponible</span>
+                    {% endif %}
+                </p>
+            {% endfor %}
             <h2>Créer un emprunt pour un média disponible</h2>
+            <h2>Restituer un emprunt</h2>
         </div>
         <div>
             <h2>MEDIAS</h2>
@@ -32,15 +63,14 @@
                 <ul>
                     {% for Livre in Livres %}
                     <li> 
-                        Titre : {{ Livre.nom }}  Auteur : {{ Livre.auteur }}
-                        <br>
-                        <button><a href="{% url 'modifier_livre' Livre.id %}">Modifier</a></button> |
+                        Titre : {{ Livre.nom }} ¤ Auteur : {{ Livre.auteur }}
+                        <button><a href="{% url 'modifier_livre' Livre.id %}">Modifier</a></button>
                         <button><a href="{% url 'supprimer_livre' Livre.id %}">Supprimer</a></button>
                     </li>
                     {% empty %}
                     <li>Aucun livre ajouté pour le moment.</li>
                     {% endfor %}
-               </ul>
+                </ul>
             </div>
             <div>
                 <h3>Ajouter un DVD</h3>
@@ -53,9 +83,8 @@
                 <ul>
                     {% for dvd in Dvds %}
                         <li>
-                            Titre : {{ dvd.nom }} | Réalisateur : {{ dvd.realisateur }}
-                            <br>
-                            <button><a href="{% url 'modifier_dvd' dvd.id %}">Modifier</a></button> |
+                            Titre : {{ dvd.nom }} ¤ Réalisateur : {{ dvd.realisateur }}
+                            <button><a href="{% url 'modifier_dvd' dvd.id %}">Modifier</a></button>
                             <button><a href="{% url 'supprimer_dvd' dvd.id %}">Supprimer</a></button>
                         </li>
                     {% empty %}
@@ -74,9 +103,8 @@
                 <ul>
                     {% for cd in Cds %}
                         <li>
-                            Titre : {{ cd.nom }} | Interprète : {{ cd.interprete }}
-                            <br>
-                            <button><a href="{% url 'modifier_cd' cd.id %}">Modifier</a></button> |
+                            Titre : {{ cd.nom }} ¤ Interprète : {{ cd.interprete }}
+                            <button><a href="{% url 'modifier_cd' cd.id %}">Modifier</a></button>
                             <button><a href="{% url 'supprimer_cd' cd.id %}">Supprimer</a></button>
                         </li>
                     {% empty %}
@@ -86,7 +114,7 @@
             </div>
         </div>
         <div>
-            <h2>Rentrer un emprunt</h2>
+            <h2>Les jeux disponibles à la mediathèque</h2>
         </div>
     </main>
 </body>

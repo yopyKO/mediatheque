@@ -8,10 +8,10 @@
 <body>
     <header>
         <nav>
-            <ul>
-                <li><a href="{% url 'accueil' %}">Accueil bibliothécaire</a></li>
-                <li><a href="{% url 'connexion' %}">Page d'accueil utilisateur</a></li>
-            </ul>
+            <button><a href="{% url 'accueil' %}">Accueil bibliothécaire</a></button>
+            <button><a href="{% url 'liste_livres_publique' %}">Livres</a></button>
+            <button><a href="{% url 'liste_dvds_publique' %}">DVDs</a></button>
+            <button><a href="{% url 'liste_cds_publique' %}">CDs</a></button>  
         </nav>
         <div class="container">
             <div class="form">
@@ -29,20 +29,16 @@
         </div>
     </header>
     <main>
-        <h2>LISTE DES MEDIAS</h2>
-        <nav>
+        <h2>Choisir un média pour en avoir la liste</h2>
+        <div>
             <ul>
-                <a href="{% url 'liste_livres_publique' %}"><h3>Livres</h3></a>
-            </ul>
-            <ul>
-                <a href="{% url 'liste_dvds_publique' %}"><h3>DVDs</h3></a>
-            </ul>
-            <ul>
-                <a href="{% url 'liste_cds_publique' %}"><h3>CDs</h3></a>
+                <li><a href="{% url 'liste_livres_publique' %}"><h3>Livres</h3></a></li>
+                <li><a href="{% url 'liste_dvds_publique' %}"><h3>DVDs</h3></a></li>
+                <li><a href="{% url 'liste_cds_publique' %}"><h3>CDs</h3></a></li>
             </ul>
             <ul>
             </ul>
-        </nav>
+        </div>
     </main>
    
 </body>

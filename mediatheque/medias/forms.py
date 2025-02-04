@@ -1,17 +1,22 @@
 from django import forms
-from medias.models import Livre, Dvd, Cd
+from medias.models import Media, Livre, Dvd, Cd
 
-class CreationLivreForm(forms.ModelForm):
+class MediaForm(forms.ModelForm):
+    class Meta:
+        model = Media
+        fields = ['nom']  # Champs communs à tous les médias
+
+class CreationLivreForm(MediaForm):
     class Meta:
         model = Livre
-        fields = ['nom', 'auteur']
+        fields = MediaForm.Meta.fields + ['auteur']  # Ajout du champ spécifique au livre
 
 class CreationDvdForm(forms.ModelForm):
     class Meta:
         model = Dvd
-        fields = ['nom', 'realisateur']
+        fields = MediaForm.Meta.fields + ['realisateur'] # Ajout du champ spécifique au dvd
 
 class CreationCdForm(forms.ModelForm):
     class Meta:
         model = Cd
-        fields = ['nom', 'interprete']
+        fields = MediaForm.Meta.fields + ['interprete'] # Ajout du champ spécifique au cd
