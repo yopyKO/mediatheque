@@ -18,7 +18,7 @@
             <h2>MEMBRES</h2>
             <div>
                 <h3>Ajouter un Membre</h3>
-                <form action="" method="post" action="" novalidate>
+                <form action="" method="post" novalidate>
                     {% csrf_token %}
                     {{ CreationMembre.as_p }}
                     <input type="submit" value="Envoyer">
@@ -39,13 +39,101 @@
         </div>
         <div>
             {% for Media in Medias %}
-                <p>{{ media.nom }}
-                    {% if media.disponible %}
-                        <a href="{% url 'emprunter' media.id %}" class="btn btn-primary">Emprunter</a>
-                    {% else %}
-                        <span style="color: red;">Indisponible</span>
-                    {% endif %}
-                </p>
+                {% with Media.get_real_instance as instance %}
+                    <p>{{ instance.nom }} - Type : {{ Media.get_type }} 
+                        <br>
+                        {% if instance.get_type == 'Livre' %}
+                                - Auteur : {{ instance.auteur }} 
+                                <br>
+                                {% if Media.disponible %}
+                                <form action="{% url 'emprunter' Media.id 0 %}" method="get" onsubmit="return redirectToEmprunt(this)">
+                                    <select name="membre_id" required>
+                                        <option value="" disabled selected>Choisir un membre</option>
+                                        {% for Membre in Membres %}
+                                            <option value="{{ Membre.id }}">{{ Membre.prenom }} {{ Membre.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit">Emprunter</button>
+                                </form>
+                                <script>
+                                    function redirectToEmprunt(form) {
+                                        let membreId = form.membre_id.value;
+                                        if (!membreId) {
+                                            alert("Veuillez sélectionner un membre !");
+                                            return false;
+                                        }
+                                        let actionUrl = form.action.replace('/0/', `/${membreId}/`);
+                                        window.location.href = actionUrl;
+                                        return false;
+                                    }
+                                </script>
+                                    {% else %}
+                                    <button><span style="color: red;">Indisponible</span></button>
+                                    <button><a href="{% url 'restituer' Media.id %}">Restituer</a></button>
+                                {% endif %}
+                            {% elif instance.get_type == 'DVD' %}
+                                - Réalisateur : {{ instance.realisateur }} 
+                                <br>
+                                {% if Media.disponible %}
+                                <form action="{% url 'emprunter' Media.id 0 %}" method="get" onsubmit="return redirectToEmprunt(this)">
+                                    <select name="membre_id" required>
+                                        <option value="" disabled selected>Choisir un membre</option>
+                                        {% for Membre in Membres %}
+                                            <option value="{{ Membre.id }}">{{ Membre.prenom }} {{ Membre.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit">Emprunter</button>
+                                </form>
+                                <script>
+                                    function redirectToEmprunt(form) {
+                                        let membreId = form.membre_id.value;
+                                        if (!membreId) {
+                                            alert("Veuillez sélectionner un membre !");
+                                            return false;
+                                        }
+                                        let actionUrl = form.action.replace('/0/', `/${membreId}/`);
+                                        window.location.href = actionUrl;
+                                        return false;
+                                    }
+                                </script>
+                                    {% else %}
+                                    <button><span style="color: red;">Indisponible</span></button>
+                                    <button><a href="{% url 'restituer' Media.id %}">Restituer</a></button>
+                                {% endif %}
+                            {% elif instance.get_type == 'CD' %}
+                                - Interprète : {{ instance.interprete }} 
+                                <br>
+                                {% if Media.disponible %}
+                                <form action="{% url 'emprunter' Media.id 0 %}" method="get" onsubmit="return redirectToEmprunt(this)">
+                                    <select name="membre_id" required>
+                                        <option value="" disabled selected>Choisir un membre</option>
+                                        {% for Membre in Membres %}
+                                            <option value="{{ Membre.id }}">{{ Membre.prenom }} {{ Membre.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit">Emprunter</button>
+                                </form>
+                                <script>
+                                    function redirectToEmprunt(form) {
+                                        let membreId = form.membre_id.value;
+                                        if (!membreId) {
+                                            alert("Veuillez sélectionner un membre !");
+                                            return false;
+                                        }
+                                        let actionUrl = form.action.replace('/0/', `/${membreId}/`);
+                                        window.location.href = actionUrl;
+                                        return false;
+                                    }
+                                </script>
+                                    {% else %}
+                                    <button><span style="color: red;">Indisponible</span></button>
+                                    <button><a href="{% url 'restituer' Media.id %}">Restituer</a></button>
+                                {% endif %}
+                        {% endif %}
+                    </p>
+                {% endwith %}
+            {% empty %}
+                <p>Aucun média disponible.</p>
             {% endfor %}
             <h2>Créer un emprunt pour un média disponible</h2>
             <h2>Restituer un emprunt</h2>
@@ -54,7 +142,7 @@
             <h2>MEDIAS</h2>
             <div>
                 <h3>Ajouter un Livre</h3>
-                <form action="" method="post" action="" novalidate>
+                <form action="" method="post" novalidate>
                     {% csrf_token %}
                     {{ CreationLivre.as_p }}
                     <input type="submit" value="Envoyer">

@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
@@ -66,6 +67,7 @@ def accueil(request):
     dvds = Dvd.objects.all()
     cds = Cd.objects.all()
     membres = Membre.objects.all()
+    medias = Media.objects.all()
 
     return render(request, 'accueil.html',{
         'CreationLivre': livre_form,
@@ -76,6 +78,7 @@ def accueil(request):
         'Cds': cds,
         'CreationMembre': membre_form,
         'Membres': membres,
+        'Medias': medias,
         })
 
 def deconnexion(request):
@@ -192,48 +195,54 @@ def liste_dvds_publique(request):
     return render(request,'liste_dvds_publique.html',{'Dvds':Dvds})
 
 @login_required
-def emprunter(request, media_id):
+def emprunter(request, media_id,membre_id):
     media = get_object_or_404(Media, id=media_id)
-
-    # Vérifier si l'utilisateur a un compte membre
-    membre = get_object_or_404(Membre, user=request.user)
+    membre = get_object_or_404(Membre, id=membre_id)
 
     # Vérifier si le média est disponible
     if not media.disponible:
         messages.error(request, "Ce média est déjà emprunté.")
+        return redirect('accueil')
+    
+    # Vérifier si le membre a déjà 3 emprunts en cours
+    emprunts_actifs = Emprunt.objects.filter(membre=membre).count()
+    if emprunts_actifs >= 3:
+        messages.error(request, "Vous avez atteint la limite de 3 emprunts simultanés.")
         return redirect('accueil')
 
     # Créer l'emprunt
     Emprunt.objects.create(
         media=media,
         membre=membre,
-        date_emprunt=timezone.now()
+        date_emprunt=timezone.now(),
+        date_retour_prevu = timezone.now() + timedelta(days=7)  # Retour dans 7 jours
     )
 
     # Marquer le média comme indisponible
     media.disponible = False
     media.save()
 
-    messages.success(request, f"Vous avez emprunté '{media.nom}' avec succès !")
+    messages.success(request, f"Vous avez emprunté '{media.nom}' avec succès jusqu'au {Emprunt.date_retour_prevu}.")
     return redirect('accueil')
 
 @login_required
 def restituer(request, media_id):
-    media = get_object_or_404(Livre, id=media_id)
-    membre = get_object_or_404(Membre, user=request.user)
+    media = get_object_or_404(Media, id=media_id)
 
-    emprunt = Emprunt.objects.filter(media=media, membre=membre).first()
+    # Vérifier si un emprunt existe pour ce média et ce membre
+    emprunt = Emprunt.objects.get(media=media, date_retour__isnull=True)
 
     if not emprunt:
-        messages.error(request, "Vous n'avez pas emprunté ce média.")
+        messages.error(request, "Média non emprunté")
         return redirect('accueil')
-
-    # Supprimer l'emprunt ou le marquer comme terminé
-    emprunt.delete()
-
-    # Marquer le média comme disponible
+    
+    # Mettre à jour l'état du média
     media.disponible = True
     media.save()
 
-    messages.success(request, f"Vous avez retourné '{media.nom}'.")
+    # Marquer l'emprunt comme terminé
+    emprunt.date_retour = timezone.now()
+    emprunt.save()
+
+    messages.success(request, f"Le média {media.nom} a été restitué avec succès.")
     return redirect('accueil')

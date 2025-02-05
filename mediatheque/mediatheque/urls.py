@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from auth_app import views
+from auth_app.views import emprunter
 
 urlpatterns = [
     path('', views.connexion, name='connexion'),
@@ -35,6 +36,6 @@ urlpatterns = [
     path('supprimer-cd/<int:cd_id>/', views.supprimer_cd, name='supprimer_cd'),
     path('modifier-membre/<int:membre_id>/', views.modifier_membre, name='modifier_membre'),
     path('supprimer-membre/<int:membre_id>/', views.supprimer_membre, name='supprimer_membre'),
-    path('emprunter/<int:media_id>/', views.emprunter, name='emprunter'),
+    path('emprunter/<int:media_id>/<int:membre_id>/', emprunter, name='emprunter'),
     path('restituer/<int:media_id>/', views.restituer, name='restituer'),
 ]

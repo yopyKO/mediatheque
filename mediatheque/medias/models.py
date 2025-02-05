@@ -13,10 +13,13 @@ class Media(models.Model):
     def emprunter(media_id, membre_id):
         try:
             media = Media.objects.get(id=media_id)
-            membre = membre.objects.get(id=membre_id)
+            membre = Membre.objects.get(id=membre_id)
 
             if not media.disponible:
-                raise ValidationError("Ce media est déjà emprunté.")
+                raise ValidationError("Ce média est déjà emprunté.")
+            
+            if not Emprunt.membre_peut_emprunter(membre):
+                raise ValidationError("Vous ne pouvez pas emprunter plus de 3 médias à la fois.")
 
             # Création de l'emprunt
             emprunt = Emprunt.objects.create(
@@ -58,6 +61,25 @@ class Media(models.Model):
         except Emprunt.DoesNotExist:
             return "Ce média n'était pas emprunté."
     
+    def get_type(self):
+        if hasattr(self, 'livre'):
+            return 'Livre'
+        elif hasattr(self, 'dvd'):
+            return 'DVD'
+        elif hasattr(self, 'cd'):
+            return 'CD'
+        return 'Inconnu'
+    
+    def get_real_instance(self):
+        #Retourne l'instance spécifique du media (Livre, DVD, CD)
+        if hasattr(self, 'livre'):
+            return self.livre
+        elif hasattr(self, 'dvd'):
+            return self.dvd
+        elif hasattr(self, 'cd'):
+            return self.cd
+        return self  # Retourne Media par défaut si ce n'est aucune des sous-classes
+    
 class Livre(Media):
     auteur = models.CharField(max_length=150)
 
@@ -80,7 +102,14 @@ class Emprunt(models.Model):
     media = models.ForeignKey(Media, on_delete=models.CASCADE)
     membre = models.ForeignKey(Membre, on_delete=models.CASCADE)
     date_emprunt = models.DateField(auto_now_add=True)
-    date_retour = models.DateField(default=date.today() + timedelta(days=7))  # Retour dans 7 jours
+    date_retour_prevu = models.DateField(default=date.today() + timedelta(days=7))  # Retour dans 7 jours
+    date_retour = models.DateTimeField(null=True, blank=True)  # Ajout pour la restitution
 
     def __str__(self):
         return f"{self.media.nom} emprunté par {self.membre.nom}"
+    
+    @staticmethod
+    def membre_peut_emprunter(membre):
+        """ Vérifie si le membre peut emprunter un média (max 3 emprunts simultanés). """
+        emprunts_actifs = Emprunt.objects.filter(membre=membre).count()
+        return emprunts_actifs < 3

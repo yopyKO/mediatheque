@@ -11,12 +11,12 @@ class CreationLivreForm(MediaForm):
         model = Livre
         fields = MediaForm.Meta.fields + ['auteur']  # Ajout du champ spécifique au livre
 
-class CreationDvdForm(forms.ModelForm):
+class CreationDvdForm(MediaForm):
     class Meta:
         model = Dvd
         fields = MediaForm.Meta.fields + ['realisateur'] # Ajout du champ spécifique au dvd
 
-class CreationCdForm(forms.ModelForm):
+class CreationCdForm(MediaForm):
     class Meta:
         model = Cd
         fields = MediaForm.Meta.fields + ['interprete'] # Ajout du champ spécifique au cd
