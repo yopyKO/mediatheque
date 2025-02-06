@@ -199,50 +199,52 @@ def emprunter(request, media_id,membre_id):
     media = get_object_or_404(Media, id=media_id)
     membre = get_object_or_404(Membre, id=membre_id)
 
-    # Vérifier si le média est disponible
-    if not media.disponible:
-        messages.error(request, "Ce média est déjà emprunté.")
-        return redirect('accueil')
-    
-    # Vérifier si le membre a déjà 3 emprunts en cours
-    emprunts_actifs = Emprunt.objects.filter(membre=membre).count()
-    if emprunts_actifs >= 3:
-        messages.error(request, "Vous avez atteint la limite de 3 emprunts simultanés.")
+    # Vérifier si le membre a déjà emprunté 3 fois
+    if membre.nombre_emprunts_actifs() >= 3:
+        messages.error(request, "Vous avez déjà atteint la limite de 3 emprunts.")
         return redirect('accueil')
 
-    # Créer l'emprunt
+    # Vérifier si le média est disponible
+    if not media.disponible:
+        messages.error(request, "Ce média n'est pas disponible.")
+        return redirect('accueil')
+
+    # Enregistrer l'emprunt
     Emprunt.objects.create(
         media=media,
         membre=membre,
         date_emprunt=timezone.now(),
-        date_retour_prevu = timezone.now() + timedelta(days=7)  # Retour dans 7 jours
+        date_retour=None  # L'emprunt est en cours, date_retour est vide
     )
 
     # Marquer le média comme indisponible
     media.disponible = False
     media.save()
 
-    messages.success(request, f"Vous avez emprunté '{media.nom}' avec succès jusqu'au {Emprunt.date_retour_prevu}.")
+    messages.success(request, f"Le média {media.nom} a été emprunté avec succès.")
     return redirect('accueil')
 
 @login_required
 def restituer(request, media_id):
     media = get_object_or_404(Media, id=media_id)
 
-    # Vérifier si un emprunt existe pour ce média et ce membre
-    emprunt = Emprunt.objects.get(media=media, date_retour__isnull=True)
+    # Vérifier si un emprunt existe pour ce média
+    emprunt = Emprunt.objects.filter(media=media, date_retour__isnull=True).first()
 
     if not emprunt:
-        messages.error(request, "Média non emprunté")
+        messages.error(request, "Ce média n'a pas d'emprunt en cours.")
         return redirect('accueil')
     
-    # Mettre à jour l'état du média
-    media.disponible = True
-    media.save()
-
     # Marquer l'emprunt comme terminé
     emprunt.date_retour = timezone.now()
     emprunt.save()
 
-    messages.success(request, f"Le média {media.nom} a été restitué avec succès.")
+    # Mettre à jour l'état du média comme disponible
+    media.disponible = True
+    media.save()
+
+    # Mettre à jour le nombre d'emprunts actifs
+    emprunts_actifs = Emprunt.objects.filter(membre=emprunt.membre, date_retour__isnull=True).count()
+
+    messages.success(request, f"Le média {media.nom} a été restitué avec succès. Il vous reste {emprunts_actifs} emprunt(s) actif(s).")
     return redirect('accueil')

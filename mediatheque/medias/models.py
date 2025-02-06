@@ -45,16 +45,22 @@ class Media(models.Model):
     def restituer(media_id):
         try:
             media = Media.objects.get(id=media_id)
-            emprunt = Emprunt.objects.get(media=media, date_retour__gte=timezone.now())
+            
+            # Récupérer l'emprunt en cours (sans date de retour)
+            emprunt = Emprunt.objects.get(media=media, date_retour__isnull=True)
 
-            # Supprimer l'emprunt ou le marquer comme terminé
-            emprunt.delete()
+            # Marquer l'emprunt comme terminé
+            emprunt.date_retour = timezone.now()
+            emprunt.save()  # On enregistre la restitution
 
             # Rendre le média disponible
             media.disponible = True
             media.save()
 
-            return f"Média '{media.nom}' retourné avec succès."
+            # Vérifier le nouveau nombre d'emprunts actifs du membre
+            emprunts_actifs = Emprunt.objects.filter(membre=emprunt.membre, date_retour__isnull=True).count()
+
+            return f"Média '{media.nom}' retourné avec succès.. Il reste {emprunts_actifs} emprunts actifs pour ce membre."
         
         except Media.DoesNotExist:
             return "Média introuvable."
@@ -110,6 +116,19 @@ class Emprunt(models.Model):
     
     @staticmethod
     def membre_peut_emprunter(membre):
-        """ Vérifie si le membre peut emprunter un média (max 3 emprunts simultanés). """
-        emprunts_actifs = Emprunt.objects.filter(membre=membre).count()
-        return emprunts_actifs < 3
+        now = timezone.now()
+        
+        # On récupère les emprunts actifs
+        emprunts_actifs = Emprunt.objects.filter(membre=membre, date_retour__isnull=True)
+        
+        # Vérifie s'il y a des emprunts en retard
+        emprunts_en_retard = emprunts_actifs.filter(date_emprunt__lt=now - timedelta(days=7))
+        
+        if emprunts_en_retard.exists():
+            raise ValidationError("Vous avez des emprunts en retard, vous ne pouvez pas emprunter d'autres médias.")
+        
+        # Limite à 3 emprunts actifs
+        if emprunts_actifs.count() >= 3:
+            raise ValidationError("Vous ne pouvez pas emprunter plus de 3 médias simultanément.")
+    
+        return True
